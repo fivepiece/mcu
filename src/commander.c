@@ -514,8 +514,10 @@ static void commander_process_seed(yajl_val json_node)
     }
 
     if (!strlens(key)) {
-        commander_fill_report(cmd_str(CMD_seed), NULL, DBB_ERR_SD_KEY);
-        return;
+        if (!strlens(raw) && (strcmp(raw, attr_str(ATTR_bip39)) == 1)) {
+            commander_fill_report(cmd_str(CMD_seed), NULL, DBB_ERR_SD_KEY);
+            return;
+        }
     }
 
     if (sd_card_inserted() != DBB_OK) {
@@ -550,13 +552,15 @@ static void commander_process_seed(yajl_val json_node)
                 // Allows recover from a Digital Bitbox backup text entered via USB
                 memcpy(entropy_b, utils_hex_to_uint8(entropy), sizeof(entropy_b));
             }
-            sha256_Raw((const uint8_t *)entropy, strlens(entropy), entropy_b);
+            if (!(strlens(raw) && (strcmp(raw, attr_str(ATTR_bip39)) == 0))) {
+                sha256_Raw((const uint8_t *)entropy, strlens(entropy), entropy_b);
+            }
         }
 
         // add extra entropy from device unless raw is set
         add_entropy = 1;
         if (strlens(entropy) && strlens(raw)) {
-            if (!strcmp(raw, attr_str(ATTR_true))) {
+            if (!strcmp(raw, attr_str(ATTR_true)) || !strcmp(raw, attr_str(ATTR_bip39))) {
                 add_entropy = 0;
             }
         }

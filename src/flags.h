@@ -168,6 +168,7 @@ X(password)       \
 X(TFA)            \
 X(U2F)            \
 X(U2F_hijack)     \
+X(bip39)          \
 X(__ERASE__)      \
 X(__FORCE__)      \
 X(NUM)             /* keep last */
